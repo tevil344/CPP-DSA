@@ -33,7 +33,7 @@ public:
         rear++;
         Waitlist[rear] = value;
         cout << "Added: " << value << " in waitlist." << endl;
-    }
+    }       
 
     // Function to remove an element from the queue
     void done() {
