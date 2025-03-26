@@ -1,5 +1,4 @@
 #include <iostream>
-#include <queue>
 using namespace std;
 
 struct Node {
@@ -9,6 +8,45 @@ struct Node {
     Node* right;
 
     Node(string k, string v) : key(k), value(v), left(nullptr), right(nullptr) {}
+};
+
+class Queue {
+private:
+    struct QueueNode {
+        Node* treeNode;
+        QueueNode* next;
+        QueueNode(Node* node) : treeNode(node), next(nullptr) {}
+    };
+    QueueNode *front, *rear;
+
+public:
+    Queue() : front(nullptr), rear(nullptr) {}
+
+    void push(Node* node) {
+        QueueNode* temp = new QueueNode(node);
+        if (!rear) {
+            front = rear = temp;
+            return;
+        }
+        rear->next = temp;
+        rear = temp;
+    }
+
+    void pop() {
+        if (!front) return;
+        QueueNode* temp = front;
+        front = front->next;
+        if (!front) rear = nullptr;
+        delete temp;
+    }
+
+    Node* getFront() {
+        return front ? front->treeNode : nullptr;
+    }
+
+    bool empty() {
+        return front == nullptr;
+    }
 };
 
 class Dictionary {
@@ -22,7 +60,7 @@ private:
         else if (key > node->key)
             node->right = insert(node->right, key, value);
         else
-            node->value = value; // Update value if duplicate key
+            node->value = value;
         return node;
     }
 
@@ -47,7 +85,6 @@ private:
                 delete node;
                 return temp;
             }
-
             Node* temp = findMin(node->right);
             node->key = temp->key;
             node->value = temp->value;
@@ -87,10 +124,10 @@ private:
 
     void levelOrder(Node* node) {
         if (!node) return;
-        queue<Node*> q;
+        Queue q;
         q.push(node);
         while (!q.empty()) {
-            Node* current = q.front();
+            Node* current = q.getFront();
             q.pop();
             cout << current->key << ": " << current->value << endl;
             if (current->left) q.push(current->left);
@@ -138,32 +175,53 @@ public:
 
 int main() {
     Dictionary dict;
-    dict.insert("apple", "fruit");
-    dict.insert("banana", "fruit");
-    dict.insert("carrot", "vegetable");
-    dict.insert("dog", "animal");
+    int choice;
+    string key, value;
+    do {
+        cout << "\nDictionary Operations:\n";
+        cout << "1. Insert\n2. Delete\n3. Search\n4. Display (Inorder)\n5. Mirror Image\n6. Display Level-wise\n7. Create Copy\n8. Exit\nEnter choice: ";
+        cin >> choice;
 
-    cout << "Dictionary (Inorder Traversal):\n";
-    dict.display();
-
-    cout << "\nSearch for 'banana':\n";
-    dict.search("banana");
-
-    cout << "\nDelete 'carrot':\n";
-    dict.deleteWord("carrot");
-    dict.display();
-
-    cout << "\nMirror Image of Dictionary:\n";
-    dict.mirrorImage();
-    dict.display();
-
-    cout << "\nLevel-wise Display:\n";
-    dict.displayLevelWise();
-
-    cout << "\nCreate a Copy of Dictionary:\n";
-    Dictionary* copyDict = dict.createCopy();
-    copyDict->display();
-
-    delete copyDict;
+        switch (choice) {
+            case 1:
+                cout << "Enter key: "; cin >> key;
+                cout << "Enter value: "; cin >> value;
+                dict.insert(key, value);
+                break;
+            case 2:
+                cout << "Enter key to delete: "; cin >> key;
+                dict.deleteWord(key);
+                break;
+            case 3:
+                cout << "Enter key to search: "; cin >> key;
+                dict.search(key);
+                break;
+            case 4:
+                cout << "Dictionary (Inorder Traversal):\n";
+                dict.display();
+                break;
+            case 5:
+                dict.mirrorImage();
+                cout << "Mirrored Dictionary:\n";
+                dict.display();
+                break;
+            case 6:
+                cout << "Level-wise Display:\n";
+                dict.displayLevelWise();
+                break;
+            case 7: {
+                Dictionary* copyDict = dict.createCopy();
+                cout << "Copy of Dictionary:\n";
+                copyDict->display();
+                delete copyDict;
+                break;
+            }
+            case 8:
+                cout << "Exiting program..." << endl;
+                break;
+            default:
+                cout << "Invalid choice. Try again." << endl;
+        }
+    } while (choice != 8);
     return 0;
 }
